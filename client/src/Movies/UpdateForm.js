@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const initialMovie = {
-  id: Date.now(),
+  id: null,
   title: "",
   director: "",
   metascore: "",
@@ -16,6 +16,7 @@ const UpdateForm = props => {
     const movieToEdit = props.movies.find(
       element => `${element.id}` === props.match.params.id
     );
+    console.log(props.movies, movieToEdit);
     if (movieToEdit) {
       setMovie(movieToEdit);
     }
@@ -32,10 +33,22 @@ const UpdateForm = props => {
   };
 
   //need a handleSubmit with PUT request
+  const handleSubmit = e => {
+    e.preventDefault();
+    axios
+      .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
+      .then(res => {
+        console.log(res);
+        props.updateMovie(res.data);
+        setMovie(initialMovie);
+        props.history.push(`/`);
+      })
+      .catch(err => console.log(err));
+  };
 
   return (
     <div>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="title"
@@ -64,7 +77,7 @@ const UpdateForm = props => {
           value={movie.stars}
           onChange={changeHandler}
         ></input>
-        <button>Update</button>
+        <button type="submit">Update</button>
       </form>
     </div>
   );
